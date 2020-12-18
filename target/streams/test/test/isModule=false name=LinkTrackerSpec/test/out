@@ -1,0 +1,5 @@
+[0m[[0m[0minfo[0m] [0m[0m[32mLinkTrackerSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should count the total unique img/a paths in a document[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should provide a set of encoded paths for a document as a map of encoding id to path[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should provide a string version of the document with all img/a paths encoded[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should a transformation without rule should return the same XML structure[0m[0m

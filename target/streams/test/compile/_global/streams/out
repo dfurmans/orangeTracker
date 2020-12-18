@@ -1,0 +1,4 @@
+[0m[[0m[31merror[0m] [0m[0m/home/dfurman/Downloads/scala_coding_challenge/linktracker/src/test/scala/LinkTrackerSpec.scala:39:45: ';' expected but ',' found.[0m
+[0m[[0m[31merror[0m] [0m[0m    val onlyOneTheLastOneUglyRegexp = "\\s+",""[0m
+[0m[[0m[31merror[0m] [0m[0m                                            ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m

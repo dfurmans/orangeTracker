@@ -9,10 +9,10 @@ class AttributeConfiguration(val chunksAttributeNamesIncluded: List[String],
                              val chunksAttributeNameExcluded: List[String])
 
 object SearchEngine {
-  val valuesToLookingFor = List("oranges")
-  val valuesToNotLookingFor = List("bananas")
-  val elementToSearchFor = List("img", "a")
-  val attributesToSearchFor = List("src", "href")
+  val valuesToLookingFor: List[String] = List("oranges")
+  val valuesToNotLookingFor: List[String] = List("bananas")
+  val elementToSearchFor: List[String] = List("img", "a")
+  val attributesToSearchFor: List[String] = List("src", "href")
 
   val defaultSearchConfiguration: SearchEngineConfiguration =
     SearchEngineConfiguration(
@@ -20,7 +20,7 @@ object SearchEngine {
       attributes = attributesToSearchFor
     )
 
-  val allImgAndA =
+  val allImgAndA: SearchEngineConfiguration =
     SearchEngineConfiguration(elements = elementToSearchFor, attributes = attributesToSearchFor)
 
   val defaultReqAttributeChunks = new AttributeConfiguration(

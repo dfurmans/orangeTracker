@@ -14,14 +14,14 @@ case class TransformDocumentRules(elements : List[String],
                                  )
 object TransformDocumentRules{
 
-  val defaultTransformationRules = TransformDocumentRules(
+  val defaultTransformationRules: TransformDocumentRules = TransformDocumentRules(
     elements = SearchEngine.elementToSearchFor,
     attributes = SearchEngine.attributesToSearchFor,
     valuesIncluded = SearchEngine.defaultReqAttributeChunks.chunksAttributeNamesIncluded,
     valuesExcluded = SearchEngine.defaultReqAttributeChunks.chunksAttributeNameExcluded
   )
 
-  val emptyRules = TransformDocumentRules( elements = List(), attributes = List(), List() , List())
+  val emptyRules: TransformDocumentRules = TransformDocumentRules( elements = List(), attributes = List(), List() , List())
 }
 
 // DSL for our ADT model - here is a place for new implementations and operation for our small DSL
@@ -32,7 +32,8 @@ trait Interpreter {
 
 object Interpreters {
 
-  val aXMLCustomXMLInterpreter = new Interpreter {
+  val aXMLCustomXMLInterpreter: aXMLCustomXMLInterpreter = new aXMLCustomXMLInterpreter
+  class aXMLCustomXMLInterpreter extends Interpreter {
     override val interpretAsString: XMLCustom => String = xmlCustom => {
       writeWholeDocument(
         xmlAsString(xmlCustom)

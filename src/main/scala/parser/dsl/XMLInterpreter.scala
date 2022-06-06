@@ -50,10 +50,10 @@ object Interpreters {
         case XMLCustom.XMLDocument(aData) => {
           val idStateGenerator: IntegerIdGenerator = IntegerIdGenerator(0, Map())
           val chunkTransformed: Seq[(String, XMLElementChunks, List[XMLElementChunks])] = aData.map { x =>
-            val rootName = x._1
-            val alterParent: (List[XMLElementChunks], Id[Int, String]) = updateXMLEle(List(x._2), List(), trans, idStateGenerator)
-            val alterKids: (List[XMLElementChunks], Id[Int, String]) = updateXMLEle(x._3, List(), trans, alterParent._2)
-            (rootName, alterParent._1.head, alterKids._1)
+            val rootName = x(0) // in Scala 3 tuples values are accessible by 0-base-index
+            val alterParent: (List[XMLElementChunks], Id[Int, String]) = updateXMLEle(List(x(1)), List(), trans, idStateGenerator)
+            val alterKids: (List[XMLElementChunks], Id[Int, String]) = updateXMLEle(x(2), List(), trans, alterParent(1))
+            (rootName, alterParent(0).head, alterKids(0))
           }
           XMLDocument(rawData = chunkTransformed)
         }
@@ -67,7 +67,7 @@ object Interpreters {
         case x::tail => {
           val transRuleLambda: (XMLElementChunks, Id[Int, String]) => (XMLElementChunks, Id[Int, String]) = alterXMLElement(trans)
           val k = transRuleLambda(x, state)
-          updateXMLEle(tail, accEles.appended(k._1),trans, k._2)
+          updateXMLEle(tail, accEles.appended(k(0)),trans, k(1))
         }
       }
       result
@@ -84,8 +84,8 @@ object Interpreters {
               transformation.valuesIncluded.map(y=> x.contains(y)).reduce((n,m) => n && m) &&
                 transformation.valuesExcluded.map(y=> !x.contains(y)).reduce((n,m) => n && m)}).reduce((x,y) => x && y )){
             val newAttributeMap: (List[(String, Int)], Id[Int, String]) = recMap(attributes.toList, IdGenerators.generatorFunction, state)
-            val toMApAttribute: Map[String, String] = newAttributeMap._1.map(x => x._1 -> x._2.toString).toMap
-            val dataWithNewStateMonad : (XMLElementChunks, Id[Int, String]) = (dataToAlter.copy(metaData = Some(toMApAttribute)), newAttributeMap._2)
+            val toMApAttribute: Map[String, String] = newAttributeMap(0).map(x => x(0) -> x(1).toString).toMap
+            val dataWithNewStateMonad : (XMLElementChunks, Id[Int, String]) = (dataToAlter.copy(metaData = Some(toMApAttribute)), newAttributeMap(1))
             dataWithNewStateMonad
           } else (input,state)
         } else (input, state)
@@ -101,8 +101,8 @@ object Interpreters {
         val elements: Seq[(String, XMLElementChunks, List[XMLElementChunks])] = data
         val checkFunctionForASingleElement = check(configuration)
         elements.flatMap { aSingleDataElements => {
-          val parent: XMLElementChunks = aSingleDataElements._2
-          val kids = aSingleDataElements._3
+          val parent: XMLElementChunks = aSingleDataElements(1)
+          val kids = aSingleDataElements(2)
           val checkParents: Option[XMLElementChunks] = checkFunctionForASingleElement(parent)
           val checkKids: List[Option[XMLElementChunks]] = kids.map(k => checkFunctionForASingleElement(k))
           checkKids ::: List(checkParents)
@@ -127,23 +127,23 @@ object Interpreters {
 
   // Rewriting data List[(String, String)] into to the List[String,Int] where second type parameter is evaluated by generator
   def recMap(data: List[(String, String)], functionGenerator: Int => Int, generator: Id[Int,String]): (List[(String, Int)], Id[Int,String]) ={
-    val keys = data.map(kk=> kk._1)
-    val values = data.map(kk=> kk._2)
+    val keys = data.map(kk=> kk(0))
+    val values = data.map(kk=> kk(1))
 
     def recurs(data: (List[String], List[String]), acc: List[(String, Int)], generatorId: Id[Int,String]): (List[(String, Int)], Id[Int,String]) ={
 
-      val subResult: (List[(String, Int)], Id[Int, String]) = data._1 match {
+      val subResult: (List[(String, Int)], Id[Int, String]) = data(0) match {
         case Nil => (acc,generator)
         case x::tail => {
           val xTail = tail
-          data._2 match {
+          data(1) match {
             case Nil => (acc, generator)
             case y::tail => {
               val yTail = tail
               val r: ((String, Int), Id[Int, String]) = changeForSingleTuple(functionGenerator, (x,y), generatorId)
-              val accumulatorData: List[(String, Int)] = acc:+r._1
-              val chunkResult: List[(String, Int)] = recurs(Tuple2(xTail, yTail), accumulatorData, r._2)._1
-              (chunkResult, r._2)
+              val accumulatorData: List[(String, Int)] = acc:+r(0)
+              val chunkResult: List[(String, Int)] = recurs(Tuple2(xTail, yTail), accumulatorData, r(1))(0)
+              (chunkResult, r(1))
             }
           }
         }
@@ -155,8 +155,8 @@ object Interpreters {
   }
 
   def changeForSingleTuple(functionGenerator: Int=>Int, t : (String, String), generators: Id[Int,String]): ((String, Int), Id[Int, String]) ={
-    val nextGeneratorState = generators.generateNextId(functionGenerator)(t._1)
-    (t._1 -> nextGeneratorState._1, nextGeneratorState._2)
+    val nextGeneratorState = generators.generateNextId(functionGenerator)(t(0))
+    (t(0) -> nextGeneratorState(0), nextGeneratorState(1))
   }
 
   lazy val check: SearchEngine => XMLElementChunks => Option[XMLElementChunks] = forSuchAConf => forSuchAnElement => {
@@ -190,9 +190,9 @@ object Interpreters {
       case XMLCustom.XMLDocument(data) => {
         data.map { x =>
         {
-          val topLevelTag = x._1
-          val startTag: String = writeStartTag(x._2.tagName)
-          val innerTags: List[String] = x._3.map { inner =>
+          val topLevelTag = x(0)
+          val startTag: String = writeStartTag(x(1).tagName)
+          val innerTags: List[String] = x(2).map { inner =>
           {
             inner.xmlType match {
               case ElementType | SpecialElementType =>
@@ -204,7 +204,7 @@ object Interpreters {
             }
           }
           }
-          val endTag: String = writeEndTag(x._2.tagName)
+          val endTag: String = writeEndTag(x(1).tagName)
           (topLevelTag, startTag, innerTags, endTag)
         }
         }
@@ -231,7 +231,7 @@ object Interpreters {
   def writeAttributes(attribute: Option[Map[String, String]]): String = {
     attribute match {
       case Some(a) =>
-        a.map(aTuple => " " + aTuple._1 + "=" + "\"" + aTuple._2 + "\"" ).mkString
+        a.map(aTuple => " " + aTuple(0) + "=" + "\"" + aTuple(1) + "\"" ).mkString
       case None    => ""
     }
   }
@@ -249,7 +249,7 @@ object Interpreters {
              acc: StringBuilder): String = {
     data match {
       case x :: tail => {
-        val chunk: String = s"""${x._2} ${x._3.filter(p => p.nonEmpty).mkString} ${x._4}"""
+        val chunk: String = s"""${x(1)} ${x(2).filter(p => p.nonEmpty).mkString} ${x(3)}"""
         render(tail, acc.append("\n    ").append(chunk).append(""))
       }
       case Nil => acc.mkString

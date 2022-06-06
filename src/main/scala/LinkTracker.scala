@@ -54,7 +54,7 @@ object LinkTracker {
           val listOfMap = flipKeyValue.toList
           val encodedPaths: Seq[(String, Int)] = Interpreters.recMap(listOfMap, IDGeneratorCLIConfig.functionForGeneratesID, IntegerIdGenerator(0, Map()))._1
           // doing MAP Here for UNIQ PurposeS!
-           encodedPaths.map(x => (x._2, x._1)).toMap
+           encodedPaths.map(x => (x(1), x(0))).toMap
       },
       uniquePaths = Interpreters.scanFor(SearchEngineCLIConfig.defaultSearchConfiguration, parsed).count(_.isDefined),
       totalPaths  = Interpreters.scanFor(SearchEngineCLIConfig.elementsToFind, parsed).count(_.isDefined))

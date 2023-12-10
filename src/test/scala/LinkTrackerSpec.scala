@@ -5,9 +5,10 @@ import parser.dsl.{Interpreters, TransformDocumentRules}
 import parser.parser.Parsers
 
 import scala.xml.Elem
+import parser.adt.interpreters.PathTrackerResult
 
 class LinkTrackerSpec extends AsyncFlatSpec with Matchers {
-  val res1 = LinkTracker.parseDoc(Sample1.originalDoc)
+  val res1: PathTrackerResult = LinkTracker.parseDoc(Sample1.originalDoc)
 
   it should "count the total unique img/a paths in a document" in {
     res1.uniquePaths should be (Sample1.expectedUniquePaths)
@@ -32,7 +33,7 @@ class LinkTrackerSpec extends AsyncFlatSpec with Matchers {
     parsed should be (Interpreters.aXMLCustomXMLInterpreter.transformDocument(rules)(parsed))
   }
 
-  def sanitizeABigXMLString(xml: String) = {
+  def sanitizeABigXMLString(xml: String): String = {
     val onlyOneTheLastOneUglyRegexp =  "\\s+"
     val charactersToSanitize = ""
     xml.replaceAll(onlyOneTheLastOneUglyRegexp,charactersToSanitize)
@@ -61,7 +62,7 @@ object Sample1 {
   </body>
 </html>
 
-  val uniqueEncodedPathWithNumbers = Map(
+  val uniqueEncodedPathWithNumbers: Map[Int,String] = Map(
     0 -> "/something/about/oranges",
     1 -> "/img/oranges.jpg"
   )

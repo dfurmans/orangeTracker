@@ -55,7 +55,7 @@ object Parsers {
 
     def apply(tagsToFind: List[String]): ParserConfiguration = new ParserConfiguration(tagsToFind)
 
-    val defaultConfiguration = ParserConfiguration(
+    val defaultConfiguration: ParserConfiguration = ParserConfiguration(
       List("head", "body")
     )
   }
